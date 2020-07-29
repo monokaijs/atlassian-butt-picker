@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: postgres:11
+    restart: always
+    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: ocsg1234
+#    volumes:
+# for continously restarting while testing, no need volumes
+#      - db-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  jira:
+    container_name: jira 
+    # current latest version is 8.11
+    image: atlassian/jira-software:8.1 
+    environment:
+     - ATL_PROXY_NAME=jira.internal
+     - ATL_PROXY_PORT=80
+     - ATL_TOMCAT_SCHEME=http
+
+  nginx: 
+    container_name: nginx 
+    image: nginx:latest 
+    volumes:
+     - ./nginx.conf:/etc/nginx/nginx.conf 
+    depends_on: 
+     - jira 
+    ports: 
+     - "80:80" 
+    networks: 
+      default: 
+        aliases:
+         - jira.internal
+
+# volumes:
+#   db-data:
