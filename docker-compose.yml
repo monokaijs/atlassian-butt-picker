@@ -9,20 +9,21 @@ services:
       POSTGRES_USER: jira
       POSTGRES_DB: jira
       POSTGRES_PASSWORD: ocsg1234
-#    volumes:
+      #    volumes:
 # for continously restarting while testing, no need volumes
-#      - pg-data:/var/lib/postgresql/data
-#      - jira-data:/var/atlassian/application-data/jira
+#      - ./pg-data:/var/lib/postgresql/data
+#      - ./jira-data:/var/atlassian/application-data/jira
     ports:
       - 5432:5432
 
   jira:
     container_name: jira 
     # current latest version is 8.11
-    image: atlassian/jira-software:8.1
+    image: atlassian/jira-software:8.11
+    restart: always
     environment:
      # reverse proxy config, will be updated when deploy into aws
-     - ATL_PROXY_NAME=jira.internal
+     - ATL_PROXY_NAME=jira.spgtech-vn.com
      - ATL_PROXY_PORT=80
      - ATL_TOMCAT_SCHEME=http
      # DB config
@@ -41,6 +42,7 @@ services:
   nginx: 
     container_name: nginx 
     image: nginx:latest 
+    restart: always
     volumes:
      - ./nginx.conf:/etc/nginx/nginx.conf 
     depends_on: 
@@ -50,7 +52,7 @@ services:
     networks: 
       default: 
         aliases:
-         - jira.internal
+         - jira.spgtech-vn.com
 
 # volumes:
 #   pg-data:
