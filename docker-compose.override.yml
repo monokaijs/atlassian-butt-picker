@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    # for continously restarting while testing, no need volumes
+    volumes:
+     - ./pg-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  jira:
+    environment:
+     # reverse proxy config, will be updated when deploy into aws
+     - ATL_PROXY_NAME=jira.internal
+    volumes:
+     - ./jira-data:/var/atlassian/application-data/jira
+
+  nginx:
+    networks:
+      default:
+        aliases:
+         - jira.internal
+

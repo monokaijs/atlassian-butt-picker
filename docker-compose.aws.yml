@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    volumes:
+     - pg-data:/var/lib/postgresql/data
+
+  jira:
+    environment:
+     - ATL_PROXY_NAME=jira.spgtech-vn.com
+    volumes:
+     - jira-data:/var/atlassian/application-data/jira
+
+  nginx:
+    networks:
+      default:
+        aliases:
+         - jira.spgtech-vn.com
+
+volumes:
+  pg-data:
+  jira-data:
+
