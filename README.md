@@ -1,4 +1,19 @@
 ## Jira in docker
+
+### Cheat code
+- Build them up:
+   ```
+   docker-compose up -d
+   ```
+- Check what they are doing behind your back:
+   ```
+   docker-compose logs -f --tail 69
+   ```
+- Burn them down:
+   ```
+   docker-compose down
+   ```
+
 ### Something to note
 1. With local deployment, we need to add `127.0.0.1 jira.internal` into hosts file:
    ```
@@ -20,6 +35,21 @@
 3. Copy the generated license code, get back to your browser and submit it, then BOOM!!! you're done :whale:
 
    ![finished](images/finished.png)
+
+### SSL/TLS
+- Pls install letsencrypt certbot first: https://certbot.eff.org/docs/install.html
+- Install cert:
+   ```
+   sudo certbot certonly --standalone -d jira.domain.com -m your@email.com --agree-tos -n
+   ```
+- `TODO` - autorenew config + fully-automated cert generating :penguin:
+
+### AWS deployment
+- Simply change docker-compose files by referring `.env`:
+   ```
+   # comment out for local deployment, uncomment when deploying at AWS
+   COMPOSE_FILE=docker-compose.yml:docker-compose.aws.yml
+   ```
 
 ### Frequently Q&A
 - At **step 2**, if **java** is not installed at your machine, use below docker trick:
