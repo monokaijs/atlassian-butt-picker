@@ -9,10 +9,19 @@ services:
   jira:
     environment:
      - ATL_PROXY_NAME=jira.spgtech-vn.com
+     - ATL_TOMCAT_SECURE=true
+     - ATL_TOMCAT_SCHEME=https
+     - ATL_PROXY_PORT=443
     volumes:
      - jira-data:/var/atlassian/application-data/jira
 
   nginx:
+    # FIXME look sick, need some kind of magic
+    volumes:
+     - /etc/letsencrypt/archive/jira.spgtech-vn.com/cert1.pem:/etc/ssl/certs/jira.spgtech-vn.com.pem
+     - /etc/letsencrypt/archive/jira.spgtech-vn.com/privkey1.pem:/etc/ssl/private/jira.spgtech-vn.com.key
+    ports:
+     - 443:443
     networks:
       default:
         aliases:
