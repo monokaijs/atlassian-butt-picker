@@ -3,13 +3,17 @@ version: '3.8'
 services:
 
   postgres:
-    # for continously restarting while testing, no need volumes
     volumes:
      - ./pg-data:/var/lib/postgresql/data
     ports:
+      # expose to host for debugging
       - 5432:5432
 
   jira:
     volumes:
      - ./jira-data:/var/atlassian/application-data/jira
 
+  nginx:
+    volumes:
+     # http only, for the sake of simplicity
+     - ./default.conf.template:/etc/nginx/templates/default.conf.template
