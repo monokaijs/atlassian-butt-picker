@@ -6,10 +6,10 @@
    echo '127.0.0.1 jira.internal' | sudo tee -a /etc/hosts
    ```
 
-2. With AWS deployment, simply change docker-compose files by referring `.env`:
+2. With cloud deployment, simply change docker-compose files by referring `.env`:
    ```
-   # comment out for local deployment, uncomment when deploying at AWS
-   COMPOSE_FILE=docker-compose.yml:docker-compose.aws.yml
+   # comment out for local deployment, uncomment when deploying to cloud
+   COMPOSE_FILE=docker-compose.yml:docker-compose.cloud.yml
    ```
 
 3. For TLS certificate, pls install letsencrypt certbot first: https://certbot.eff.org/docs/install.html, then:
