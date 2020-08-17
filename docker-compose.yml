@@ -13,7 +13,6 @@ services:
 
   jira:
     container_name: jira
-    # current latest version is 8.11
     image: atlassian/jira-software:8.11
     restart: always
     environment:
@@ -36,7 +35,7 @@ services:
 
   nginx:
     container_name: nginx
-    image: nginx:latest
+    image: nginx:1.19.2
     restart: always
     environment:
      - DOMAIN_NAME
