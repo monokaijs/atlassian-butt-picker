@@ -11,9 +11,6 @@ server {
   listen [::]:443 ssl;
   server_name _;
 
-  proxy_read_timeout 600s;
-  client_max_body_size 30M;
-
   # cert stuffs
   ssl_certificate /etc/ssl/certs/server.crt;
   ssl_certificate_key /etc/ssl/private/server.key;
