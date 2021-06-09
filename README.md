@@ -1,25 +1,29 @@
 ## Jira in docker
 
-### I. Prerequisites, Before Christ
+### 0. Prerequisites
+- `docker` 19.03+, `docker-compose` 1.27+
+
+### I. Initial Config
 1. With local deployment, we need to add `127.0.0.1 jira.internal` into hosts file:
-   ```
+   ```bash
    echo '127.0.0.1 jira.internal' | sudo tee -a /etc/hosts
    ```
 
-2. With cloud deployment, simply change docker-compose files by referring `.env`:
+2. With other deployment that requires SSL, simply change docker-compose files by referring `.env`:
+   ```properties
+   # comment out for local deployment, uncomment when need SSL
+   COMPOSE_FILE=docker-compose.yml:docker-compose.ssl.yml
    ```
-   # comment out for local deployment, uncomment when deploying to cloud
-   COMPOSE_FILE=docker-compose.yml:docker-compose.cloud.yml
-   ```
+   Add your cert stuff into `cert/`, with certificate chain as `fullchain1.pem` and private key as `privkey1.pem`.
 
-3. For TLS certificate, pls install letsencrypt certbot first: https://certbot.eff.org/docs/install.html, then:
-   ```
+3. For SSL certificate auto renewal, pls install letsencrypt certbot first: https://certbot.eff.org/docs/install.html, then:
+   ```bash
    sudo certbot certonly --standalone -d jira.domain.com -m your@email.com --agree-tos -n
    ```
 
 ### II. Step by step
 1. Build them up:
-   ```
+   ```bash
    docker-compose up -d
    ```
 
@@ -28,7 +32,7 @@
    ![licsense-prompt](images/license-prompt.png)
 
 3. Copy the license server id, for example `BPOD-YXDV-LMVB-DIC0`, then run command below, with `-p` for product, `-m` for email, `-n` for license name, `-s` for license server id:
-   ```
+   ```bash
    java -jar atlassian-agent.jar \
 	-p jira \
 	-m your@email.com \
@@ -42,18 +46,18 @@
    ![finished](images/finished.png)
 
 5. Check what they are doing behind your back:
-   ```
+   ```bash
    docker-compose logs -f --tail 69
    ```
 
-6. Tired of Jira, burn them down:
-   ```
+6. Tired of Jira, burn them down, but keep the volumes in case you change your mind:
+   ```bash
    docker-compose down
    ```
 
 ### IV. Frequently Q&A
 1. At **step 3**, if **java** is not installed at your machine, use below docker trick:
-   ```
+   ```bash
    docker run --rm -v "${PWD}/atlassian-agent.jar:/atlassian-agent.jar" \
 	openjdk:8-jre-alpine \
 	java -jar atlassian-agent.jar \
@@ -68,6 +72,6 @@
 
    For the sake of simplicity, and meaningful DB config, i wont re-config it now, but will track and update if needed.
 
-3. `TODO` - TLS cert autorenew config + fully-automated cert generating :penguin:
+3. `TODO` - SSL cert autorenew config + fully-automated cert generating :penguin:
 
 4. Last but not least, the Jira crack mechanism is thank to Zhile, you can refer the source and donate to him via: https://gitee.com/pengzhile/atlassian-agent
