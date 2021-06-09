@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+
+  jira:
+    environment:
+    - ATL_TOMCAT_SECURE=true
+    - ATL_TOMCAT_SCHEME=https
+    - ATL_PROXY_PORT=443
+
+  nginx:
+    # FIXME look sick, need some kind of magic
+    volumes:
+    - ./nginx/conf.d/secure.conf.template:/etc/nginx/templates/secure.conf.template
+    # - /etc/letsencrypt/archive/${DOMAIN_NAME}/fullchain1.pem:/etc/ssl/certs/${DOMAIN_NAME}.pem
+    # - /etc/letsencrypt/archive/${DOMAIN_NAME}/privkey1.pem:/etc/ssl/private/${DOMAIN_NAME}.key
+    # we might use provided cert stuffs
+    - ./cert/fullchain1.pem:/etc/ssl/certs/server.crt
+    - ./cert/privkey1.pem:/etc/ssl/private/server.key
+    ports:
+    - 443:443
+
