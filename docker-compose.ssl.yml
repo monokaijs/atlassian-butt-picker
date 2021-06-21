@@ -12,11 +12,8 @@ services:
     # FIXME look sick, need some kind of magic
     volumes:
     - ./nginx/conf.d/secure.conf.template:/etc/nginx/templates/secure.conf.template
-    # - /etc/letsencrypt/archive/${DOMAIN_NAME}/fullchain1.pem:/etc/ssl/certs/${DOMAIN_NAME}.pem
-    # - /etc/letsencrypt/archive/${DOMAIN_NAME}/privkey1.pem:/etc/ssl/private/${DOMAIN_NAME}.key
     # we might use provided cert stuffs
-    - ./cert/fullchain1.pem:/etc/ssl/certs/server.crt
-    - ./cert/privkey1.pem:/etc/ssl/private/server.key
+    - ./certs/:/etc/nginx/certs/
     ports:
-    - 443:443
+    - "443:443"
 
