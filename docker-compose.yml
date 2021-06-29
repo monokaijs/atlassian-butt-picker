@@ -16,7 +16,7 @@ services:
   postgres:
     container_name: postgres
     image: postgres:11
-    restart: unless-stopped
+    restart: always
     environment:
       POSTGRES_USER: jira
       POSTGRES_DB: jira
@@ -28,7 +28,7 @@ services:
   jira:
     container_name: jira
     image: atlassian/jira-software:8.11
-    restart: unless-stopped
+    restart: always
     environment:
      # reverse proxy config, will be updated when deploy into other platforms
      - ATL_PROXY_NAME=${DOMAIN_NAME}
@@ -47,19 +47,5 @@ services:
      - jira-data:/var/atlassian/application-data/jira/
     depends_on:
      - postgres
-    logging: *default-logging
-
-  nginx:
-    container_name: nginx
-    image: nginx:1.19.2
-    restart: unless-stopped
-    volumes:
-     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    depends_on:
-     - jira
-    ports:
-     - "80:80"
-    networks:
-      default: {}
     logging: *default-logging
 

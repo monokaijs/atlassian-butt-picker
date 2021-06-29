@@ -1,5 +1,12 @@
 version: '3.8'
 
+x-logging:
+  &default-logging
+  driver: json-file
+  options:
+    max-size: 100m
+    max-file: "15"
+
 services:
 
   jira:
@@ -9,11 +16,18 @@ services:
     - ATL_PROXY_PORT=443
 
   nginx:
-    # FIXME look sick, need some kind of magic
+    container_name: nginx
+    image: nginx:1.19
+    restart: always
     volumes:
+    - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     - ./nginx/conf.d/secure.conf.template:/etc/nginx/templates/secure.conf.template
     # we might use provided cert stuffs
     - ./certs/:/etc/nginx/certs/
+    depends_on:
+    - jira
     ports:
+    - "80:80"
     - "443:443"
+    logging: *default-logging
 

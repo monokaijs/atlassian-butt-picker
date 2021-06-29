@@ -1,0 +1,72 @@
+version: '3.8'
+
+x-logging:
+  &default-logging
+  driver: json-file
+  options:
+    max-size: 100m
+    max-file: "15"
+
+volumes:
+  conf:
+  vhost:
+  html:
+  dhparam:
+  certs:
+  acme:
+
+services:
+
+  jira:
+    environment:
+    # jira
+    - ATL_TOMCAT_SECURE=true
+    - ATL_TOMCAT_SCHEME=https
+    - ATL_PROXY_PORT=443
+    # nginx-proxy
+    - VIRTUAL_HOST=$DOMAIN_NAME
+    - VIRTUAL_PORT=8080
+    # acme
+    - LETSENCRYPT_HOST=$DOMAIN_NAME
+    - ACME_OCSP=true
+    - ACME_PREFERRED_CHAIN=ISRG Root X1
+
+  nginx-proxy:
+    container_name: nginx-proxy
+    image: nginxproxy/nginx-proxy:0.9
+    restart: always
+    ports:
+    - "80:80"
+    - "443:443"
+    environment:
+    - DEFAULT_HOST=$DOMAIN_NAME
+    volumes:
+    - conf:/etc/nginx/conf.d/
+    - certs/:/etc/nginx/certs/:ro
+    - vhost/:/etc/nginx/vhost.d/
+    - html:/usr/share/nginx/html/
+    - /var/run/docker.sock:/tmp/docker.sock:ro
+    logging: *default-logging
+
+  nginx-proxy-acme:
+    container_name: nginx-proxy-acme
+    image: nginxproxy/acme-companion:2.1
+    restart: always
+    environment:
+    - NGINX_PROXY_CONTAINER=nginx-proxy
+    - ACME_CA_URI=https://acme-v02.api.letsencrypt.org/directory
+    - DEFAULT_EMAIL=$ACCOUNT_EMAIL
+    - RENEW_PRIVATE_KEYS=true
+    - DEFAULT_KEY_SIZE=ec-384
+    - DHPARAM_BITS=4096
+    - CERTS_UPDATE_INTERVAL=86400 # seconds (daily check)
+    volumes:
+    - certs/:/etc/nginx/certs/:rw
+    - vhost/:/etc/nginx/vhost.d/
+    - html:/usr/share/nginx/html/
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - acme:/etc/acme.sh
+    depends_on:
+    - nginx-proxy
+    logging: *default-logging
+

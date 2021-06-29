@@ -1,9 +1,25 @@
 version: '3.8'
 
+x-logging:
+  &default-logging
+  driver: json-file
+  options:
+    max-size: 100m
+    max-file: "15"
+
 services:
 
   nginx:
+    container_name: nginx
+    image: nginx:1.19
+    restart: always
     volumes:
+     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     # http only, for the sake of simplicity
     - ./nginx/conf.d/default.conf.template:/etc/nginx/templates/default.conf.template
+    depends_on:
+     - jira
+    ports:
+     - "80:80"
+    logging: *default-logging
 
