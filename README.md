@@ -6,7 +6,7 @@
 ### I. Initial Config
 You have 3 choices with 3 different kinds of deployment.
 
-1. With local deployment (no need SSL), we need to add `127.0.0.1 jira.internal` into hosts file:
+1. With local deployment (HTTP only), we need to add `127.0.0.1 jira.internal` into hosts file:
    ```bash
    echo '127.0.0.1 jira.internal' | sudo tee -a /etc/hosts
    ```
@@ -29,6 +29,7 @@ You have 3 choices with 3 different kinds of deployment.
 
 ### II. Step by step
 1. Build them up:
+
    In case of LE cert auto-renewal, you need to start `nginx-proxy` and `nginx-proxy-acme` first:
    ```bash
    docker-compose up -d nginx-proxy-acme && docker-compose logs -f nginx-proxy nginx-proxy-acme
@@ -84,6 +85,4 @@ You have 3 choices with 3 different kinds of deployment.
 
    For the sake of simplicity, and meaningful DB config, i wont re-config it now, but will track and update if needed.
 
-3. `TODO` - SSL cert autorenew config + fully-automated cert generating :penguin:
-
-4. Last but not least, the Jira crack mechanism is thank to Zhile, you can refer the source and donate to him via: https://gitee.com/pengzhile/atlassian-agent
+3. Last but not least, the Jira crack mechanism is thank to Zhile, you can refer the source and donate to him via: https://gitee.com/pengzhile/atlassian-agent
