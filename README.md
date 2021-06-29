@@ -4,28 +4,40 @@
 - `docker` 19.03+, `docker-compose` 1.27+
 
 ### I. Initial Config
-1. With local deployment, we need to add `127.0.0.1 jira.internal` into hosts file:
+You have 3 choices with 3 different kinds of deployment.
+
+1. With local deployment (no need SSL), we need to add `127.0.0.1 jira.internal` into hosts file:
    ```bash
    echo '127.0.0.1 jira.internal' | sudo tee -a /etc/hosts
    ```
 
 2. With other deployment that requires SSL, simply change docker-compose files by referring `.env`:
    ```properties
-   # comment out for local deployment, uncomment when need SSL
    COMPOSE_FILE=docker-compose.yml:docker-compose.ssl.yml
    ```
-   Add your cert stuff into `cert/`, with certificate chain as `fullchain1.pem` and private key as `privkey1.pem`.
+   Add your cert stuff into `certs/`, with full chain as `fullchain1.pem`, trusted chain as `chain1.pem` and private key as `privkey1.pem`.
 
-3. For SSL certificate auto renewal, pls install letsencrypt certbot first: https://certbot.eff.org/docs/install.html, then:
-   ```bash
-   sudo certbot certonly --standalone -d jira.domain.com -m your@email.com --agree-tos -n
+3. For Let's Encrypt SSL certificate auto-renewal, update your `.env` like below:
+   ```properties
+   COMPOSE_FILE=docker-compose.yml:docker-compose.acme.yml
+   DOMAIN_NAME=jira.your-domain.com
+   ACCOUNT_EMAIL=you@your-domain.com
    ```
+   Your SSL cert will be renewed automatically every **60 days**, and configured with `OCSP Must Staple` and `Certificate Transparency`.
+
+   Moreover, your proxy will be enabled `TLS 1.3`, `OCSP Stapling`, `Forward Secrecy` and `HSTS`.
 
 ### II. Step by step
 1. Build them up:
+   In case of LE cert auto-renewal, you need to start `nginx-proxy` and `nginx-proxy-acme` first:
    ```bash
-   docker-compose up -d
+   docker-compose up -d nginx-proxy-acme && docker-compose logs -f nginx-proxy nginx-proxy-acme
    ```
+   Then start the other containers with:
+   ```bash
+   docker-compose up -d && docker-compose logs -f
+   ```
+   If you don't need auto-renewal, only need to run the latter command.
 
 2. Everything will be automatically configured, until you reach the license prompt screen:
 
