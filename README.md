@@ -85,4 +85,18 @@ You have 3 choices with 3 different kinds of deployment.
 
    For the sake of simplicity, and meaningful DB config, i wont re-config it now, but will track and update if needed.
 
-3. Last but not least, the Jira crack mechanism is thank to Zhile, you can refer the source and donate to him via: https://gitee.com/pengzhile/atlassian-agent
+3. Change attachment size
+
+   Access this url: `https://<your-jira>/secure/admin/ViewAttachmentSettings.jspa`
+
+   Change the `Attachment Size` to what you want (e.g. 20mb ~ 20971520b - note that `mb` here is actually `mib`), then update `nginx-proxy/proxy-wide.conf` correspondingly:
+   ```nginx
+   client_max_body_size 20m;
+   ```
+
+   Recreate your `nginx-proxy` container:
+   ```bash
+   docker-compose up -d --no-deps --force-recreate nginx-proxy
+   ```
+
+4. Last but not least, the Jira crack mechanism is thank to Zhile, you can refer the source and donate to him via: https://gitee.com/pengzhile/atlassian-agent
