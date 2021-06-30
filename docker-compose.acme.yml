@@ -46,6 +46,8 @@ services:
     - vhost/:/etc/nginx/vhost.d/
     - html:/usr/share/nginx/html/
     - /var/run/docker.sock:/tmp/docker.sock:ro
+    # additional proxy-wide config
+    - ./nginx-proxy/proxy-wide.conf:/etc/nginx/conf.d/proxy-wide.conf
     logging: *default-logging
 
   nginx-proxy-acme:
