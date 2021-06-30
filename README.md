@@ -38,7 +38,7 @@ You have 3 choices with 3 different kinds of deployment.
    ```bash
    docker-compose up -d && docker-compose logs -f
    ```
-   If you don't need auto-renewal, only need to run the latter command.
+   If you don't need cert auto-renewal, only need to run the latter command.
 
 2. Everything will be automatically configured, until you reach the license prompt screen:
 
@@ -51,6 +51,14 @@ You have 3 choices with 3 different kinds of deployment.
 	-m your@email.com \
 	-n hino \
 	-o akatsuki \
+	-s BPOD-YXDV-LMVB-DIC0
+   ```
+   If `java` is not installed at your machine, use below docker command:
+   ```bash
+   docker run --rm -v "${PWD}/atlassian-agent.jar:/atlassian-agent.jar" \
+	openjdk:8-jre-alpine \
+	java -jar atlassian-agent.jar \
+	-p jira -m your@email.com -n hino -o akatsuki \
 	-s BPOD-YXDV-LMVB-DIC0
    ```
 
@@ -69,23 +77,14 @@ You have 3 choices with 3 different kinds of deployment.
    ```
 
 ### IV. Frequently Q&A
-1. At **step 3**, if **java** is not installed at your machine, use below docker trick:
-   ```bash
-   docker run --rm -v "${PWD}/atlassian-agent.jar:/atlassian-agent.jar" \
-	openjdk:8-jre-alpine \
-	java -jar atlassian-agent.jar \
-	-p jira -m your@email.com -n hino -o akatsuki \
-	-s BPOD-YXDV-LMVB-DIC0
-   ```
-
-2. Be aware that changing postgres default database name (`postgres` -> `jira`), it'll create a new database `jira` and doesn't accept incoming connection during that time. Therefore you may encouter a problem when Jira perform DB pre-database startup check and can not start Jira server. You may need to:
+1. Be aware that changing postgres default database name (`postgres` -> `jira`), it'll create a new database `jira` and doesn't accept incoming connection during that time. Therefore you may encouter a problem when Jira perform DB pre-database startup check and can not start Jira server. You may need to:
    + Simply restart jira service with: `docker-compose restart jira`
    + Change postgres config `POSTGRES_DB` and `POSTGRES_USER` back to default as `postgres`
    + Implement docker delayed startup config, pls refer: https://docs.docker.com/compose/startup-order/
 
-   For the sake of simplicity, and meaningful DB config, i wont re-config it now, but will track and update if needed.
+   For the sake of simplicity, and meaningful DB config, I wont re-config it now, but will track and update if needed.
 
-3. Change attachment size
+2. Change attachment size
 
    Access this url: `https://<your-jira>/secure/admin/ViewAttachmentSettings.jspa`
 
@@ -99,4 +98,4 @@ You have 3 choices with 3 different kinds of deployment.
    docker-compose up -d --no-deps --force-recreate nginx-proxy
    ```
 
-4. Last but not least, the Jira crack mechanism is thank to Zhile, you can refer the source and donate to him via: https://gitee.com/pengzhile/atlassian-agent
+3. Last but not least, the Jira crack mechanism is thank to Zhile, you can refer the source and donate to him via: https://gitee.com/pengzhile/atlassian-agent
