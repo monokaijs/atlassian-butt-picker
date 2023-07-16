@@ -16,35 +16,6 @@ volumes:
   acme:
 
 services:
-
-  jira:
-    environment:
-    # jira
-    - ATL_TOMCAT_SECURE=true
-    - ATL_TOMCAT_SCHEME=https
-    - ATL_PROXY_PORT=443
-    # nginx-proxy
-    - VIRTUAL_HOST=$DOMAIN_NAME
-    - VIRTUAL_PORT=8080
-    # acme
-    - LETSENCRYPT_HOST=$DOMAIN_NAME
-    - ACME_OCSP=true
-    - ACME_PREFERRED_CHAIN=ISRG Root X1
-
-  confluence:
-    environment:
-    # jira
-    - ATL_TOMCAT_SECURE=true
-    - ATL_TOMCAT_SCHEME=https
-    - ATL_PROXY_PORT=443
-    # nginx-proxy
-    - VIRTUAL_HOST=$DOCS_DOMAIN_NAME
-    - VIRTUAL_PORT=8090
-    # acme
-    - LETSENCRYPT_HOST=$DOCS_DOMAIN_NAME
-    - ACME_OCSP=true
-    - ACME_PREFERRED_CHAIN=ISRG Root X1
-
   bitbucket:
     environment:
       #bitbucket

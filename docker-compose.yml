@@ -1,11 +1,7 @@
 version: '3.8'
 
 volumes:
-  pg-data: {}
-  pg-data2: {}
   pg-data3: {}
-  jira-data: {}
-  confluence-data: {}
   bitbucket-data: {}
 
 x-logging:
@@ -16,31 +12,6 @@ x-logging:
     max-file: "15"
 
 services:
-
-  postgres:
-    container_name: postgres
-    image: postgres:11
-    restart: always
-    environment:
-      POSTGRES_USER: jira
-      POSTGRES_DB: jira
-      POSTGRES_PASSWORD: ocsg1234
-    volumes:
-     - pg-data:/var/lib/postgresql/data/
-    logging: *default-logging
-
-  postgres2:
-    container_name: postgres2
-    image: postgres:11
-    restart: always
-    environment:
-      POSTGRES_USER: confluence
-      POSTGRES_DB: confluence
-      POSTGRES_PASSWORD: ocsg1234
-    volumes:
-     - pg-data2:/var/lib/postgresql/data/
-    logging: *default-logging
-
   postgres3:
     container_name: postgres3
     image: postgres:11
@@ -55,7 +26,7 @@ services:
 
   bitbucket:
     container_name: bitbucket
-    image: atlassian/bitbucket-server
+    image: atlassian/bitbucket-server:7.13.0
     restart: always
     environment:
       - SERVER_PROXY_NAME=${BUCKET_DOMAIN_NAME}
@@ -72,52 +43,5 @@ services:
       - bitbucket-data:/var/atlassian/application-data/bitbucket/
     depends_on:
       - postgres3
-    logging: *default-logging
-
-  confluence:
-    container_name: confluence
-    image: atlassian/confluence-server:7.13.2
-    restart: always
-    environment:
-     - ATL_PROXY_NAME=${DOCS_DOMAIN_NAME}
-     - ATL_PROXY_PORT=80
-     - ATL_TOMCAT_SCHEME=http
-     # DB config
-     - ATL_JDBC_URL=jdbc:postgresql://postgres2:5432/confluence
-     - ATL_JDBC_USER=confluence
-     - ATL_JDBC_PASSWORD=ocsg1234
-     - ATL_DB_DRIVER=org.postgresql.Driver
-     - ATL_DB_TYPE=postgresql
-     # let's crack it :)
-     - JVM_SUPPORT_RECOMMENDED_ARGS=-javaagent:/atlassian-agent.jar
-    volumes:
-     - ./atlassian-agent.jar:/atlassian-agent.jar
-     - confluence-data:/var/atlassian/application-data/confluence/
-    depends_on:
-     - postgres2
-    logging: *default-logging
-
-  jira:
-    container_name: jira
-    image: atlassian/jira-software:8.11
-    restart: always
-    environment:
-     # reverse proxy config, will be updated when deploy into other platforms
-     - ATL_PROXY_NAME=${DOMAIN_NAME}
-     - ATL_PROXY_PORT=80
-     - ATL_TOMCAT_SCHEME=http
-     # DB config
-     - ATL_JDBC_URL=jdbc:postgresql://postgres:5432/jira
-     - ATL_JDBC_USER=jira
-     - ATL_JDBC_PASSWORD=ocsg1234
-     - ATL_DB_DRIVER=org.postgresql.Driver
-     - ATL_DB_TYPE=postgres72
-     # let's crack it :)
-     - JVM_SUPPORT_RECOMMENDED_ARGS=-javaagent:/atlassian-agent.jar
-    volumes:
-     - ./atlassian-agent.jar:/atlassian-agent.jar
-     - jira-data:/var/atlassian/application-data/jira/
-    depends_on:
-     - postgres
     logging: *default-logging
 
