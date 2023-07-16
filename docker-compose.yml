@@ -2,7 +2,11 @@ version: '3.8'
 
 volumes:
   pg-data: {}
+  pg-data2: {}
+  pg-data3: {}
   jira-data: {}
+  confluence-data: {}
+  bitbucket-data: {}
 
 x-logging:
   &default-logging
@@ -23,6 +27,74 @@ services:
       POSTGRES_PASSWORD: ocsg1234
     volumes:
      - pg-data:/var/lib/postgresql/data/
+    logging: *default-logging
+
+  postgres2:
+    container_name: postgres2
+    image: postgres:11
+    restart: always
+    environment:
+      POSTGRES_USER: confluence
+      POSTGRES_DB: confluence
+      POSTGRES_PASSWORD: ocsg1234
+    volumes:
+     - pg-data2:/var/lib/postgresql/data/
+    logging: *default-logging
+
+  postgres3:
+    container_name: postgres3
+    image: postgres:11
+    restart: always
+    environment:
+      POSTGRES_USER: bitbucket
+      POSTGRES_DB: bitbucket
+      POSTGRES_PASSWORD: ocsg1234
+    volumes:
+     - pg-data3:/var/lib/postgresql/data/
+    logging: *default-logging
+
+  bitbucket:
+    container_name: bitbucket
+    image: atlassian/bitbucket-server
+    restart: always
+    environment:
+      - SERVER_PROXY_NAME=${BUCKET_DOMAIN_NAME}
+      - SERVER_PROXY_PORT=80
+      - SERVER_SCHEME=https
+      - SERVER_SECURE=true
+      - JDBC_DRIVER=org.postgresql.Driver
+      - JDBC_USER=bitbucket
+      - JDBC_PASSWORD=ocsg1234
+      - JDBC_URL=jdbc:postgresql://postgres3:5432/bitbucket
+      - JVM_SUPPORT_RECOMMENDED_ARGS=-javaagent:/atlassian-agent.jar
+    volumes:
+      - ./atlassian-agent.jar:/atlassian-agent.jar
+      - bitbucket-data:/var/atlassian/application-data/bitbucket/
+    depends_on:
+      - postgres3
+    logging: *default-logging
+
+  confluence:
+    container_name: confluence
+    image: atlassian/confluence-server:7.13.2
+    restart: always
+    environment:
+     - ATL_PROXY_NAME=${DOCS_DOMAIN_NAME}
+     - ATL_PROXY_PORT=80
+     - ATL_TOMCAT_SCHEME=http
+     # DB config
+     - ATL_JDBC_URL=jdbc:postgresql://postgres2:5432/confluence
+     - ATL_JDBC_USER=confluence
+     - ATL_JDBC_PASSWORD=ocsg1234
+     - ATL_DB_DRIVER=org.postgresql.Driver
+     - ATL_DB_TYPE=postgresql
+     # let's crack it :)
+     - JVM_SUPPORT_RECOMMENDED_ARGS=-javaagent:/atlassian-agent.jar
+    volumes:
+     - ./atlassian-agent.jar:/atlassian-agent.jar
+     - confluence-data:/var/atlassian/application-data/confluence/
+    depends_on:
+     - postgres2
     logging: *default-logging
 
   jira:

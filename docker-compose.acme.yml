@@ -31,6 +31,34 @@ services:
     - ACME_OCSP=true
     - ACME_PREFERRED_CHAIN=ISRG Root X1
 
+  confluence:
+    environment:
+    # jira
+    - ATL_TOMCAT_SECURE=true
+    - ATL_TOMCAT_SCHEME=https
+    - ATL_PROXY_PORT=443
+    # nginx-proxy
+    - VIRTUAL_HOST=$DOCS_DOMAIN_NAME
+    - VIRTUAL_PORT=8090
+    # acme
+    - LETSENCRYPT_HOST=$DOCS_DOMAIN_NAME
+    - ACME_OCSP=true
+    - ACME_PREFERRED_CHAIN=ISRG Root X1
+
+  bitbucket:
+    environment:
+      #bitbucket
+      - SERVER_SCHEME=https
+      - SERVER_SECURE=true
+      - SERVER_PROXY_PORT=443
+      # nginx-proxy
+      - VIRTUAL_HOST=$BUCKET_DOMAIN_NAME
+      - VIRTUAL_PORT=7990
+      # acme
+      - LETSENCRYPT_HOST=$BUCKET_DOMAIN_NAME
+      - ACME_OCSP=true
+      - ACME_PREFERRED_CHAIN=ISRG Root X1
+
   nginx-proxy:
     container_name: nginx-proxy
     image: nginxproxy/nginx-proxy:0.9
@@ -41,10 +69,10 @@ services:
     environment:
     - DEFAULT_HOST=$DOMAIN_NAME
     volumes:
-    - conf:/etc/nginx/conf.d/
-    - certs/:/etc/nginx/certs/:ro
-    - vhost/:/etc/nginx/vhost.d/
-    - html:/usr/share/nginx/html/
+    - conf:/etc/nginx/conf.d
+    - certs:/etc/nginx/certs/:ro
+    - vhost:/etc/nginx/vhost.d
+    - html:/usr/share/nginx/html
     - /var/run/docker.sock:/tmp/docker.sock:ro
     # additional proxy-wide config
     - ./nginx-proxy/proxy-wide.conf:/etc/nginx/conf.d/proxy-wide.conf
@@ -63,9 +91,9 @@ services:
     - DHPARAM_BITS=4096
     - CERTS_UPDATE_INTERVAL=86400 # seconds (daily check)
     volumes:
-    - certs/:/etc/nginx/certs/:rw
-    - vhost/:/etc/nginx/vhost.d/
-    - html:/usr/share/nginx/html/
+    - certs:/etc/nginx/certs/:rw
+    - vhost:/etc/nginx/vhost.d
+    - html:/usr/share/nginx/html
     - /var/run/docker.sock:/var/run/docker.sock:ro
     - acme:/etc/acme.sh
     depends_on:
